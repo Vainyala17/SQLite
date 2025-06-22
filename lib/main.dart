@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sqlite_learning/user_list.dart';
-import 'database_helper.dart'; // Import the DatabaseHelper class
-import 'user.dart'; // Import the User class
+import 'package:sqlite_learning/example1/user_list.dart';
+import 'example1/database_helper.dart'; // Import the DatabaseHelper class
+import 'example1/user.dart';
+import 'example2/homePage.dart'; // Import the User class
 
 void main() async {
   // Initialize the database and insert users
@@ -17,7 +18,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'User Management',
-      home: UserList(),
+//      home: UserList(),
+      home: Home(),
     );
   }
 }

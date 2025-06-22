@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sqlite_learning/user.dart';
+import 'package:sqlite_learning/example1/user.dart';
 
 import 'database_helper.dart';
 
@@ -29,7 +29,7 @@ class _UserListState extends State<UserList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GFG User List'),
+        title: Text('SQLite'),
         backgroundColor: Colors.lightGreen,
       ),
       body: ListView.builder(
