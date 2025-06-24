@@ -3,18 +3,42 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqlite_learning/example2/planet.dart';
 
+import 'moon.dart';
+
 class DataBase {
   Future<Database> initializedDB() async {
     String path = await getDatabasesPath();
     return openDatabase(
       join(path, 'planets.db'),
       version: 1,
-      onCreate: (Database db, int version) async {
-        await db.execute(
-          "CREATE TABLE planets(id INTEGER PRIMARY KEY , name TEXT NOT NULL,age INTEGER NOT NULL,distancefromsun INTEGER NOT NULL)",
-        );
-      },
+        onCreate: (Database db, int version) async {
+          // Enable foreign key constraints (important in SQLite)
+          await db.execute("PRAGMA foreign_keys = ON");
+          await db.execute
+            ('''CREATE TABLE IF NOT EXISTS planets(
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            distancefromsun INTEGER NOT NULL)''');
+          // Create moons table with foreign key referencing planets.id
+          await db.execute
+            ('''CREATE TABLE IF NOT EXISTS moons(
+            moon_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            moon_name TEXT NOT NULL,
+            planet_id INTEGER,
+            FOREIGN KEY (planet_id) REFERENCES planets(id) ON DELETE CASCADE)''');
+        }
     );
+  }
+  Future<int> insertMoon(Moon moon) async {
+    final db = await initializedDB();
+    return await db.insert('moons', moon.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<Moon>> getMoons() async {
+    final db = await initializedDB();
+    final result = await db.query('moons');
+    return result.map((e) => Moon.fromMap(e)).toList();
   }
 
   // insert data

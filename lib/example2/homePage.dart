@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sqlite_learning/example2/planet.dart';
 
 import 'database.dart';
+import 'moon.dart';
 
 class Home extends StatefulWidget {
   Home({Key? key}) : super(key: key);
@@ -58,6 +59,10 @@ class _HomeState extends State<Home> {
     await handler.updatePlanet(planet);
     setState(() {});
   }
+  Future<List<Moon>> getMoonsByPlanetId(int planetId) async {
+    List<Moon> allMoons = await handler.getMoons();
+    return allMoons.where((moon) => moon.planetId == planetId).toList();
+  }
 
   @override
   void initState() {
@@ -65,6 +70,11 @@ class _HomeState extends State<Home> {
     handler = DataBase();
     handler.initializedDB().whenComplete(() async {
       await addPlanets();
+      await handler.insertMoon(Moon(moonName: "Moon 1", planetId: 1));
+      await handler.insertMoon(Moon(moonName: "Moon 2", planetId: 3));
+      await handler.insertMoon(Moon(moonName: "Phobos", planetId: 4));
+      await handler.insertMoon(Moon(moonName: "Deimos", planetId: 4));
+
       setState(() {});
     });
   }
@@ -92,36 +102,53 @@ class _HomeState extends State<Home> {
                   itemCount: snapshot.data?.length,
                   itemBuilder: (BuildContext context, int index) {
                     final planet = snapshot.data![index];
-                    return Card(
-                      color: Colors.orange.shade100,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(8.0),
-                        title: Text(planet.name),
-                        subtitle: Text('Age: ${planet.age}'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                // Example edit: Update the planet's name
-                                editPlanet(Planets(
-                                  id: planet.id,
-                                  name: '${planet.name} Updated',
-                                  age: planet.age,
-                                  distancefromsun: planet.distancefromsun,
-                                ));
-                              },
+
+                    return FutureBuilder<List<Moon>>(
+                      future: getMoonsByPlanetId(planet.id),
+                      builder: (context, moonSnapshot) {
+                        final moons = moonSnapshot.data ?? [];
+
+                        return Card(
+                          color: Colors.orange.shade100,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(8.0),
+                            title: Text(planet.name),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Age: ${planet.age}'),
+                                Text('Distance from Sun: ${planet.distancefromsun}'),
+                                if (moons.isNotEmpty)
+                                  Text('Moons: ${moons.map((e) => e.moonName).join(', ')}'),
+                                if (moons.isEmpty)
+                                  Text('No moons', style: TextStyle(color: Colors.grey)),
+                              ],
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () {
-                                deletePlanet(planet.id);
-                              },
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () {
+                                    editPlanet(Planets(
+                                      id: planet.id,
+                                      name: '${planet.name} Updated',
+                                      age: planet.age,
+                                      distancefromsun: planet.distancefromsun,
+                                    ));
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    deletePlanet(planet.id);
+                                  },
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     );
                   },
                 );
