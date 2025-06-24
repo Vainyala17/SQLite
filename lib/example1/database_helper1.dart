@@ -19,7 +19,6 @@ class DatabaseHelper {
 
     return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
-
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE gfg_users (
@@ -29,7 +28,6 @@ class DatabaseHelper {
       )
     ''');
   }
-
   Future<int> insertUser(User user) async {
     Database db = await instance.db;
     return await db.insert('gfg_users', user.toMap());
