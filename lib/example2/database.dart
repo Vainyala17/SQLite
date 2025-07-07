@@ -49,7 +49,6 @@ class DataBase {
       result = await db.insert('planets', planet.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
-
     return result;
   }
 
