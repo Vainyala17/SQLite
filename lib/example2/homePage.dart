@@ -74,7 +74,6 @@ class _HomeState extends State<Home> {
       await handler.insertMoon(Moon(moonName: "Moon 2", planetId: 3));
       await handler.insertMoon(Moon(moonName: "Phobos", planetId: 4));
       await handler.insertMoon(Moon(moonName: "Deimos", planetId: 4));
-
       setState(() {});
     });
   }
